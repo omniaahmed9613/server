@@ -13,6 +13,8 @@ mongoose.connect(process.env.MONGO_URI,{useNewUrlParser:true,useUnifiedTopology:
 })
 const PORT=process.env.PORT || 5000;
 app.use(cors({credentials:true, origin:"http://localhost:8080"}));
+app.set('views',path.join(__dirname,'views'));
+app.set('view engine','pug')
 app.use(express.json());
 app.use(cookieparser());
 app.use('/account',require('./routes/account'));
