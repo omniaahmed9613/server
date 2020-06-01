@@ -12,24 +12,27 @@ mongoose.connect(process.env.MONGO_URI,{useNewUrlParser:true,useUnifiedTopology:
     console.log(`MongoDB connected...`);
 })
 const PORT=process.env.PORT || 5000;
-app.use(cors({credentials:true, origin:"http://localhost:8080"}));
+app.use(cors({credentials:true, origin:"http://localhost:8080",maxAge:86400}));
 app.set('views',path.join(__dirname,'views'));
 app.set('view engine','pug')
 app.use(express.json());
 app.use(cookieparser());
 app.use('/account',require('./routes/account'));
+app.use('/find',require('./routes/scrape'));
 app.use('/user_images',express.static(path.resolve(__dirname,'user_images')));
 app.get('/check-token',async(req,res)=>{
 const token=req.cookies.Authorization;
+if(!token) return res.status(400).send('Token not found!')
 try{
 const validate=jwt.verify(token,process.env.TOKEN_SECRET);
 res.sendStatus(200);
 }
 catch(err){
-res.sendStatus(404);
+res.status(400).send('token unvalid');
 }
 });
 app.get('/delete-token',async(req,res)=>{
+    // if(!req.cookies.Authorization) return res.sendStatus(400)
     res.clearCookie('Authorization').sendStatus(200);
 })
 app.listen(PORT,()=>{
